@@ -1,0 +1,55 @@
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#include <LiquidCrystal_I2C.h>
+
+// Data wire is plugged into digital pin 2
+#define ONE_WIRE_BUS 2
+
+// Setup a oneWire instance
+OneWire oneWire(ONE_WIRE_BUS);
+
+// Pass our oneWire reference to Dallas Temperature
+DallasTemperature sensors(&oneWire);
+
+// Set the LCD address to 0x27 for a 16x2 display
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+void setup() {
+  // Start serial communication
+  Serial.begin(9600);
+  
+  // Start up the temperature sensor library
+  sensors.begin();
+  
+  // Initialize the LCD
+  lcd.init();
+  lcd.backlight();
+  lcd.print("Temp Monitoring");
+  lcd.setCursor(0, 1);
+  lcd.print("System");
+  delay(2000);
+  lcd.clear();
+}
+
+void loop() {
+  // Request temperature reading
+  sensors.requestTemperatures();
+  
+  // Get temperature in Celsius
+  float tempC = sensors.getTempCByIndex(0);
+  
+  // Display on Serial Monitor
+  Serial.print("Temperature: ");
+  Serial.print(tempC);
+  Serial.println("°C");
+  
+  // Display on LCD
+  lcd.setCursor(0, 0);
+  lcd.print("Temperature:");
+  lcd.setCursor(0, 1);
+  lcd.print(tempC);
+  lcd.print((char)223); // Degree symbol
+  lcd.print("C");
+  
+  delay(1000); // Wait 1 second between readings
+}
